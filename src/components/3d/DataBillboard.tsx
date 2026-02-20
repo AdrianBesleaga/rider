@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { CryptoTicker, StockQuote, NewsItem } from '../../types';
+import { CryptoTicker, StockQuote, NewsItem, StartupInfo } from '../../types';
 
 /**
  * DataBillboard — renders data as Canvas textures (NO DOM = fast!)
@@ -21,9 +21,15 @@ function createTextTexture(
     canvas.height = height;
     const ctx = canvas.getContext('2d')!;
 
-    // Dark background
-    ctx.fillStyle = 'rgba(6, 10, 18, 0.95)';
+    // Transparent background with subtle dark tint
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = 'rgba(4, 8, 20, 0.4)';
     ctx.fillRect(0, 0, width, height);
+
+    // Subtle glow border
+    ctx.strokeStyle = 'rgba(0, 229, 255, 0.5)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(2, 2, width - 4, height - 4);
 
     drawFn(ctx, width, height);
 
@@ -223,4 +229,71 @@ export function createNewsTexture(item: NewsItem): THREE.CanvasTexture {
         ctx.font = '16px monospace';
         ctx.fillText(`${item.source} · ${item.publishedAt}`, 30, h - 30);
     });
+}
+
+export function createStartupTexture(startup: StartupInfo): THREE.CanvasTexture {
+    return createTextTexture((ctx, w, h) => {
+        // Category tag
+        ctx.fillStyle = '#c084fc';
+        ctx.font = 'bold 14px monospace';
+        ctx.fillText(startup.category.toUpperCase(), 30, 30);
+
+        // Name
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 36px monospace';
+        ctx.fillText(startup.name, 30, 70);
+
+        // Tagline
+        ctx.fillStyle = '#00e5ff';
+        ctx.font = 'italic 20px sans-serif';
+        ctx.fillText(startup.tagline, 30, 100);
+
+        // Description (word-wrapped)
+        ctx.fillStyle = '#b8c4d8';
+        ctx.font = '16px sans-serif';
+        const words = startup.description.split(' ');
+        let line = '';
+        let y = 135;
+        for (const word of words) {
+            const test = line + word + ' ';
+            if (ctx.measureText(test).width > w - 60 && line) {
+                ctx.fillText(line.trim(), 30, y);
+                line = word + ' ';
+                y += 22;
+                if (y > 220) break;
+            } else {
+                line = test;
+            }
+        }
+        ctx.fillText(line.trim(), 30, y);
+
+        // Funding
+        ctx.fillStyle = '#00e676';
+        ctx.font = 'bold 16px monospace';
+        ctx.fillText(`💰 ${startup.funding}`, 30, h - 70);
+
+        // Founded
+        ctx.fillStyle = '#818cf8';
+        ctx.font = '14px monospace';
+        ctx.fillText(`Founded ${startup.founded}`, 30, h - 48);
+
+        // Competitors
+        ctx.fillStyle = '#ff6b6b';
+        ctx.font = 'bold 14px monospace';
+        ctx.fillText('Competitors:', 30, h - 25);
+        ctx.fillStyle = '#f59e0b';
+        ctx.font = '14px monospace';
+        ctx.fillText(startup.competitors.join('  ·  '), 140, h - 25);
+    }, 600, 320);
+}
+
+export function createSummaryTexture(lines: string[], color: string = '#00e5ff'): THREE.CanvasTexture {
+    return createTextTexture((ctx, w, h) => {
+        ctx.fillStyle = color;
+        ctx.font = 'bold 28px monospace';
+        ctx.textAlign = 'center';
+        lines.forEach((line, i) => {
+            ctx.fillText(line, w / 2, 40 + i * 38);
+        });
+    }, 600, 40 + lines.length * 38 + 20);
 }

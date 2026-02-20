@@ -52,6 +52,18 @@ export interface NewsItem {
     summary: string;
 }
 
+// ─── Startup types ───
+
+export interface StartupInfo {
+    name: string;
+    tagline: string;
+    description: string;
+    founded: string;
+    funding: string;
+    competitors: string[];
+    category: string;
+}
+
 // ─── App state ───
 
 export type ContentTab = 'charts' | 'news' | 'spotlight';

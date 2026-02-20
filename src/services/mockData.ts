@@ -162,3 +162,59 @@ const NEWS_ITEMS: NewsItem[] = [
 export function getNewsItems(): NewsItem[] {
     return NEWS_ITEMS;
 }
+
+// ─── Startup Mock Data ───
+
+import { StartupInfo } from '../types';
+
+const STARTUPS: StartupInfo[] = [
+    {
+        name: 'Cognify AI',
+        tagline: 'Autonomous AI agents for enterprise workflows',
+        description: 'Cognify builds AI agents that automate complex business processes end-to-end. Their platform integrates with existing tools like Salesforce, SAP, and Slack to handle multi-step workflows without human intervention.',
+        founded: '2024',
+        funding: 'Series A — $28M (Sequoia)',
+        competitors: ['UiPath', 'Automation Anywhere', 'Adept AI'],
+        category: 'AI Automation',
+    },
+    {
+        name: 'NeonDB',
+        tagline: 'Serverless Postgres for the AI era',
+        description: 'Neon provides serverless, autoscaling Postgres with branching and instant provisioning. Used by AI companies for vector storage and real-time analytics with built-in pgvector support.',
+        founded: '2022',
+        funding: 'Series B — $104M (Menlo Ventures)',
+        competitors: ['Supabase', 'PlanetScale', 'CockroachDB'],
+        category: 'Infrastructure',
+    },
+    {
+        name: 'Synthflow',
+        tagline: 'AI voice agents for customer support',
+        description: 'Synthflow creates hyper-realistic AI phone agents that handle inbound and outbound calls. Their models understand context, emotions, and can resolve 85% of support tickets without escalation.',
+        founded: '2023',
+        funding: 'Seed — $7.4M (a16z)',
+        competitors: ['Bland AI', 'Retell AI', 'Vapi'],
+        category: 'Conversational AI',
+    },
+    {
+        name: 'LightMatter',
+        tagline: 'Photonic chips for AI inference',
+        description: 'LightMatter builds optical interconnects and photonic processors that run AI models 10x faster at 90% less power consumption. Their Passage chip enables wafer-scale AI accelerators.',
+        founded: '2017',
+        funding: 'Series D — $400M ($3.5B valuation)',
+        competitors: ['Cerebras', 'Groq', 'SambaNova'],
+        category: 'AI Hardware',
+    },
+    {
+        name: 'RunwayML',
+        tagline: 'AI-powered video generation & editing',
+        description: 'Runway offers Gen-3 Alpha, a foundation model for video generation. Filmmakers and studios use it to create cinematic footage from text prompts, revolutionizing post-production workflows.',
+        founded: '2018',
+        funding: 'Series D — $141M ($4B valuation)',
+        competitors: ['Pika Labs', 'Sora (OpenAI)', 'Kling'],
+        category: 'Creative AI',
+    },
+];
+
+export function getStartups(): StartupInfo[] {
+    return STARTUPS;
+}
