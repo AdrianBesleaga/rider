@@ -45,13 +45,48 @@ export const Cyclist: React.FC<CyclistProps> = ({ cadence }) => {
                 // Center: shift so bike is at origin
                 clone.position.x -= BIKE_CENTER_X;
                 clone.position.z -= BIKE_CENTER_Z;
+
+                // Add cyan emissive glow to wheel rim meshes
+                if (WHEEL_NAMES.includes(child.name)) {
+                    clone.traverse((part) => {
+                        if ((part as THREE.Mesh).isMesh) {
+                            const mesh = part as THREE.Mesh;
+                            const oldMat = mesh.material as THREE.MeshStandardMaterial;
+                            // Clone material so we don't affect the cached original
+                            const mat = oldMat.clone();
+                            mat.emissive = new THREE.Color('#00e5ff');
+                            mat.emissiveIntensity = 0.6;
+                            mesh.material = mat;
+                        }
+                    });
+                }
+
                 group.add(clone);
             }
         });
 
+        // Add glowing rim rings (fake bloom halos) on each wheel
+        const glowRingMat = new THREE.MeshBasicMaterial({
+            color: '#00e5ff', transparent: true, opacity: 0.2,
+            depthWrite: false, side: THREE.DoubleSide,
+        });
+        // Wheel centers in model space (from inspection)
+        const wheelCenters = [
+            { y: 2.09, z: 3.07 },   // freewheel (rear)
+            { y: 2.09, z: -3.12 },  // front_wheel001
+        ];
+        wheelCenters.forEach(({ y, z }) => {
+            const ring = new THREE.Mesh(
+                new THREE.TorusGeometry(2.05, 0.15, 8, 48),
+                glowRingMat
+            );
+            ring.position.set(0, y, z - BIKE_CENTER_Z);
+            ring.rotation.y = Math.PI / 2;
+            group.add(ring);
+        });
+
         // Scale the whole group
         group.scale.setScalar(SCALE);
-        // Position so wheels touch the ground (wheel center is at y≈1.51 in model, after scale: 1.51*0.233 ≈ 0.35)
         group.position.y = 0;
 
         return group;

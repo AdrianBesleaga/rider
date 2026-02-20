@@ -21,9 +21,9 @@ export const Road: React.FC<{ speed: number }> = ({ speed }) => {
     // Shared materials — create once
     const mats = useMemo(() => ({
         road: new THREE.MeshStandardMaterial({ color: '#0d1117', roughness: 0.9, metalness: 0.1 }),
-        dash: new THREE.MeshBasicMaterial({ color: '#00e5ff', transparent: true, opacity: 0.8 }),
-        edge: new THREE.MeshBasicMaterial({ color: '#00e5ff', transparent: true, opacity: 0.8 }),
-        edgeGlow: new THREE.MeshBasicMaterial({ color: '#00e5ff', transparent: true, opacity: 0.15, depthWrite: false }),
+        dash: new THREE.MeshBasicMaterial({ color: '#00e5ff', transparent: true, opacity: 1.0 }),
+        edge: new THREE.MeshBasicMaterial({ color: '#00e5ff', transparent: true, opacity: 1.0 }),
+        edgeGlow: new THREE.MeshBasicMaterial({ color: '#00e5ff', transparent: true, opacity: 0.25, depthWrite: false }),
     }), []);
 
     const chunkOffsets = useMemo(() =>
@@ -69,7 +69,7 @@ export const Road: React.FC<{ speed: number }> = ({ speed }) => {
                         position={[-ROAD_WIDTH / 2 + 0.08, 0.012, 0]}
                         material={mats.edge}
                     >
-                        <planeGeometry args={[0.12, CHUNK_LENGTH]} />
+                        <planeGeometry args={[0.18, CHUNK_LENGTH]} />
                     </mesh>
 
                     {/* Right edge line */}
@@ -78,7 +78,7 @@ export const Road: React.FC<{ speed: number }> = ({ speed }) => {
                         position={[ROAD_WIDTH / 2 - 0.08, 0.012, 0]}
                         material={mats.edge}
                     >
-                        <planeGeometry args={[0.12, CHUNK_LENGTH]} />
+                        <planeGeometry args={[0.18, CHUNK_LENGTH]} />
                     </mesh>
 
                     {/* Left edge GLOW strip (fake bloom) */}
@@ -87,7 +87,7 @@ export const Road: React.FC<{ speed: number }> = ({ speed }) => {
                         position={[-ROAD_WIDTH / 2 + 0.08, 0.008, 0]}
                         material={mats.edgeGlow}
                     >
-                        <planeGeometry args={[0.5, CHUNK_LENGTH]} />
+                        <planeGeometry args={[0.8, CHUNK_LENGTH]} />
                     </mesh>
                     {/* Right edge GLOW strip */}
                     <mesh
@@ -95,7 +95,7 @@ export const Road: React.FC<{ speed: number }> = ({ speed }) => {
                         position={[ROAD_WIDTH / 2 - 0.08, 0.008, 0]}
                         material={mats.edgeGlow}
                     >
-                        <planeGeometry args={[0.5, CHUNK_LENGTH]} />
+                        <planeGeometry args={[0.8, CHUNK_LENGTH]} />
                     </mesh>
                 </group>
             ))}

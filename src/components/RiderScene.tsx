@@ -166,7 +166,7 @@ export const RiderScene: React.FC<RiderSceneProps> = ({
     return (
         <div style={{ width: '100%', height: '100%', position: 'relative' }}>
             <Canvas
-                camera={{ fov: 55, near: 0.1, far: 300, position: [0, 1.5, 4.0] }}
+                camera={{ fov: 70, near: 0.1, far: 300, position: [1.5, 2.0, 4.0] }}
                 gl={{ antialias: true, alpha: false, powerPreference: 'high-performance' }}
                 dpr={[1, 1.5]}
                 performance={{ min: 0.5 }}
