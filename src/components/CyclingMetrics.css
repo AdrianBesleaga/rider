@@ -1,0 +1,210 @@
+.cycling-metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px;
+    height: 100%;
+    overflow-y: auto;
+}
+
+/* ─── Header ─── */
+
+.metrics-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 4px;
+}
+
+.connection-indicator {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.indicator-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--text-muted);
+}
+
+.connection-indicator.connected .indicator-dot {
+    background: var(--color-gain);
+    box-shadow: 0 0 8px var(--color-gain);
+    animation: pulse-dot 2s ease-in-out infinite;
+}
+
+.connection-indicator.connecting .indicator-dot {
+    background: var(--color-warning);
+    animation: pulse-dot 0.8s ease-in-out infinite;
+}
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}
+
+.indicator-text {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+}
+
+.connection-indicator.connected .indicator-text {
+    color: var(--color-gain);
+}
+
+.connect-btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--accent);
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.connect-btn:hover {
+    background: var(--accent);
+    color: var(--bg-primary);
+    box-shadow: 0 0 20px rgba(0, 194, 255, 0.3);
+}
+
+.btn-icon {
+    font-size: 14px;
+}
+
+.disconnect-btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--color-loss);
+    background: transparent;
+    color: var(--color-loss);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.disconnect-btn:hover {
+    background: var(--color-loss);
+    color: white;
+}
+
+/* ─── Metric Cards ─── */
+
+.metric-card {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 12px;
+    transition: border-color 0.2s;
+}
+
+.metric-card:hover {
+    border-color: var(--border-hover);
+}
+
+.metric-card.primary {
+    background: linear-gradient(135deg, var(--surface-2), var(--surface-3));
+    border-color: var(--accent-dim);
+}
+
+.metric-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.hr-zone {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    color: var(--bg-primary);
+    font-weight: 800;
+}
+
+.metric-value {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+}
+
+.metric-number {
+    font-family: var(--font-mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1;
+}
+
+.metric-card.primary .metric-number {
+    font-size: 42px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.metric-unit {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-muted);
+}
+
+.mono {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ─── Power Bar ─── */
+
+.power-bar {
+    margin-top: 10px;
+    height: 4px;
+    background: var(--surface-1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.power-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), var(--color-gain));
+    border-radius: 2px;
+    transition: width 0.5s ease-out;
+}
+
+/* ─── Grid ─── */
+
+.metrics-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.metrics-grid .metric-number {
+    font-size: 22px;
+}

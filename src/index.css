@@ -1,0 +1,330 @@
+/* ═══════════════════════════════════════════════
+   Stock Rider — Global Design System
+   "Bloomberg Terminal meets Cycling Cockpit"
+   ═══════════════════════════════════════════════ */
+
+:root {
+    /* ─── Color Palette ─── */
+    --bg-primary: #0a0e17;
+    --bg-secondary: #0f1520;
+    --surface-1: #141b2a;
+    --surface-2: #1a2235;
+    --surface-3: #222d42;
+
+    --border: rgba(255, 255, 255, 0.06);
+    --border-hover: rgba(255, 255, 255, 0.12);
+
+    --text-primary: #e8ecf4;
+    --text-secondary: #8b95a8;
+    --text-muted: #505c72;
+
+    --accent: #00c2ff;
+    --accent-light: #5de0ff;
+    --accent-dim: rgba(0, 194, 255, 0.15);
+
+    --color-gain: #00e676;
+    --color-gain-bg: rgba(0, 230, 118, 0.12);
+    --color-loss: #ff5252;
+    --color-loss-bg: rgba(255, 82, 82, 0.12);
+
+    --color-warning: #ffc107;
+
+    /* HR Zones */
+    --color-zone-1: #60a5fa;
+    --color-zone-2: #34d399;
+    --color-zone-3: #fbbf24;
+    --color-zone-4: #f97316;
+    --color-zone-5: #ef4444;
+
+    /* ─── Typography ─── */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+}
+
+/* ─── Reset ─── */
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+body {
+    font-family: var(--font-sans);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── App Layout ─── */
+
+.app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* ─── Top Bar ─── */
+
+.top-bar {
+    display: flex;
+    align-items: center;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    height: 48px;
+    flex-shrink: 0;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 20px;
+    height: 100%;
+    border-right: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.brand-icon {
+    font-size: 20px;
+}
+
+.brand-name {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-light));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.brand-tag {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+}
+
+.ticker-wrapper {
+    flex: 1;
+    overflow: hidden;
+}
+
+.view-toggle-btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 14px;
+    margin-right: 12px;
+    border-radius: 6px;
+    border: 1px solid var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.view-toggle-btn:hover {
+    background: var(--accent);
+    color: var(--bg-primary);
+    box-shadow: 0 0 16px rgba(0, 194, 255, 0.3);
+}
+
+/* ─── Main Content ─── */
+
+.main-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ─── Left Panel (Cycling) ─── */
+
+.left-panel {
+    width: 280px;
+    min-width: 280px;
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-secondary);
+    overflow: hidden;
+}
+
+.left-panel-top {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.left-panel-bottom {
+    height: 200px;
+    min-height: 200px;
+    border-top: 1px solid var(--border);
+}
+
+/* ─── Right Panel (Data Feeds) ─── */
+
+.right-panel {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Tab Bar */
+
+.content-tabs {
+    display: flex;
+    gap: 0;
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.content-tab {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 12px 24px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.content-tab:hover {
+    color: var(--text-secondary);
+    background: var(--surface-1);
+}
+
+.content-tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    background: var(--surface-1);
+}
+
+.tab-icon {
+    font-size: 14px;
+}
+
+/* Content Area */
+
+.content-area {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.content-pane {
+    flex: 1;
+    overflow: hidden;
+}
+
+/* ─── Scrollbar ─── */
+
+::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--border-hover);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* ─── Glass Effect ─── */
+
+.glass {
+    background: rgba(26, 34, 53, 0.6);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+}
+
+/* ─── Animations ─── */
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in {
+    animation: fade-in 0.4s ease-out;
+}
+
+/* ─── Responsive: Tablet ─── */
+
+@media (max-width: 900px) {
+    .left-panel {
+        width: 220px;
+        min-width: 220px;
+    }
+
+    .brand-tag {
+        display: none;
+    }
+}
+
+@media (max-width: 640px) {
+    .main-content {
+        flex-direction: column;
+    }
+
+    .left-panel {
+        width: 100%;
+        min-width: 100%;
+        height: 45%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .left-panel-bottom {
+        height: 140px;
+        min-height: 140px;
+    }
+
+    .right-panel {
+        flex: 1;
+    }
+}
