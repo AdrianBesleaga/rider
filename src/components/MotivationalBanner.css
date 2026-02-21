@@ -1,0 +1,77 @@
+/* ═══════════════════════════════════════
+   Motivational Banner — HUD Overlay
+   ═══════════════════════════════════════ */
+
+.moti-banner {
+    position: absolute;
+    top: 56px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 15;
+    max-width: 520px;
+    width: max-content;
+    padding: 10px 24px;
+    border-radius: 10px;
+    background: rgba(10, 14, 23, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    pointer-events: none;
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.moti-banner.moti-visible {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.moti-banner.moti-hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-8px);
+}
+
+.moti-text {
+    font-family: var(--font-sans, 'Inter', sans-serif);
+    font-size: 13px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.88);
+    line-height: 1.45;
+    letter-spacing: 0.2px;
+    text-align: center;
+    display: block;
+}
+
+.moti-ai-badge {
+    display: inline-block;
+    font-family: var(--font-mono, monospace);
+    font-size: 9px;
+    font-weight: 700;
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-top: 4px;
+    letter-spacing: 0.5px;
+}
+
+.moti-ai-ready {
+    color: #00e676;
+    background: rgba(0, 230, 118, 0.12);
+    border: 1px solid rgba(0, 230, 118, 0.25);
+}
+
+.moti-ai-loading {
+    color: #c084fc;
+    background: rgba(192, 132, 252, 0.12);
+    border: 1px solid rgba(192, 132, 252, 0.25);
+    animation: ai-pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes ai-pulse {
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}

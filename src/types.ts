@@ -17,29 +17,6 @@ export interface PowerSample {
 
 export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected';
 
-// ─── Financial data types ───
-
-export interface CryptoTicker {
-    id: string;
-    symbol: string;
-    name: string;
-    price: number;
-    change24h: number;        // percent
-    sparkline: number[];      // last 24h prices
-}
-
-export interface StockQuote {
-    symbol: string;
-    name: string;
-    price: number;
-    change: number;           // absolute
-    changePercent: number;    // percent
-    volume: number;
-    high: number;
-    low: number;
-    data: { time: string; value: number }[];
-}
-
 // ─── News types ───
 
 export interface NewsItem {
@@ -66,4 +43,23 @@ export interface StartupInfo {
 
 // ─── App state ───
 
-export type ContentTab = 'charts' | 'news' | 'spotlight';
+export type ContentTab = 'news' | 'spotlight' | 'learn' | 'explorer';
+
+export type RideStyle = 'road' | 'mtb';
+
+export type FactCategory = RideStyle | 'motivation';
+
+// ─── World Explorer types ───
+
+export interface RoutePoint {
+    lat: number;
+    lng: number;
+    elevation: number; // meters above sea level
+}
+
+export interface WorldRoute {
+    name: string;
+    country: string;
+    points: RoutePoint[];
+    totalDistance: number; // meters
+}

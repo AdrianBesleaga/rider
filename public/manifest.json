@@ -1,0 +1,22 @@
+{
+    "name": "Stock Rider",
+    "short_name": "StockRider",
+    "description": "Indoor cycling meets real-world knowledge. Ride smart, learn while you burn.",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#0a0e17",
+    "theme_color": "#00c2ff",
+    "orientation": "landscape",
+    "icons": [
+        {
+            "src": "/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

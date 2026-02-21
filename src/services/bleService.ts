@@ -15,6 +15,7 @@ import { CyclingData, ConnectionStatus } from '../types';
 // BLE Service UUIDs
 const FTMS_SERVICE = 0x1826;
 const INDOOR_BIKE_DATA = 0x2AD2;
+const FTMS_CONTROL_POINT = 0x2AD9;
 const HEART_RATE_SERVICE = 0x180D;
 const HEART_RATE_MEASUREMENT = 0x2A37;
 
@@ -23,6 +24,8 @@ type StatusCallback = (status: ConnectionStatus) => void;
 
 export class BleService {
     private device: BluetoothDevice | null = null;
+    private controlPoint: BluetoothRemoteGATTCharacteristic | null = null;
+    private hasControl = false;
     private onDataCallbacks: DataCallback[] = [];
     private onStatusCallbacks: StatusCallback[] = [];
     private _status: ConnectionStatus = 'disconnected';
@@ -51,6 +54,16 @@ export class BleService {
     private emitData(data: Partial<CyclingData>) {
         this.onDataCallbacks.forEach(cb => cb(data));
     }
+
+    // ─── BLE write safety: rate limit + min delta ───
+    private _lastWriteTime = 0;
+    private _lastGrade = 0;
+    private _lastResistance = 0;
+    private _writeInFlight = false;
+    private static readonly MIN_WRITE_INTERVAL = 2000; // ms between writes
+    private static readonly MIN_GRADE_DELTA = 0.5;      // % change to trigger write
+    private static readonly MIN_RESISTANCE_DELTA = 1;    // level change to trigger write
+    private static readonly MAX_GRADE = 20;              // cap at ±20%
 
     /**
      * Check if Web Bluetooth is available in the current browser
@@ -99,6 +112,16 @@ export class BleService {
                 console.warn('FTMS Indoor Bike Data not available:', e);
             }
 
+            // Acquire FTMS Control Point for writing resistance/grade
+            try {
+                const ftmsService = await server.getPrimaryService(FTMS_SERVICE);
+                this.controlPoint = await ftmsService.getCharacteristic(FTMS_CONTROL_POINT);
+                console.info('✅ FTMS Control Point acquired');
+            } catch (e) {
+                console.warn('FTMS Control Point not available (resistance control disabled):', e);
+                this.controlPoint = null;
+            }
+
             // Subscribe to Heart Rate
             try {
                 const hrService = await server.getPrimaryService(HEART_RATE_SERVICE);
@@ -124,7 +147,113 @@ export class BleService {
         if (this.device?.gatt?.connected) {
             this.device.gatt.disconnect();
         }
+        this.controlPoint = null;
+        this.hasControl = false;
         this.setStatus('disconnected');
+    }
+
+    /**
+     * Request control of the FTMS trainer (Op Code 0x00).
+     * Must be called before setSimulation/setResistance.
+     */
+    async requestControl(): Promise<boolean> {
+        if (!this.controlPoint) return false;
+        try {
+            const buf = new ArrayBuffer(1);
+            new DataView(buf).setUint8(0, 0x00); // Request Control
+            await this.controlPoint.writeValue(buf);
+            this.hasControl = true;
+            console.info('✅ FTMS control granted');
+            return true;
+        } catch (e) {
+            console.warn('Failed to request FTMS control:', e);
+            return false;
+        }
+    }
+
+    /**
+     * Set Indoor Bike Simulation parameters (Op Code 0x11).
+     * This is the realistic mode — the trainer auto-adjusts resistance
+     * to simulate the given road grade.
+     *
+     * @param grade — Road grade in % (-40 to +40)
+     * @param windSpeed — Wind speed in m/s (default 0)
+     * @param crr — Rolling resistance coefficient (default 0.004)
+     * @param cw — Wind resistance coefficient (default 0.51)
+     */
+    async setSimulation(grade: number, windSpeed = 0, crr = 0.004, cw = 0.51): Promise<void> {
+        if (!this.controlPoint) return;
+
+        // Safety: clamp grade
+        const clampedGrade = Math.max(-BleService.MAX_GRADE, Math.min(BleService.MAX_GRADE, grade));
+
+        // Safety: skip if change is too small
+        if (Math.abs(clampedGrade - this._lastGrade) < BleService.MIN_GRADE_DELTA) return;
+
+        // Safety: rate limit writes
+        const now = Date.now();
+        if (now - this._lastWriteTime < BleService.MIN_WRITE_INTERVAL) return;
+        if (this._writeInFlight) return;
+
+        if (!this.hasControl) await this.requestControl();
+
+        // FTMS spec: Op Code (1) + Wind Speed (2) + Grade (2) + Crr (1) + Cw (1) = 7 bytes
+        const buf = new ArrayBuffer(7);
+        const dv = new DataView(buf);
+        dv.setUint8(0, 0x11);
+        dv.setInt16(1, Math.round(windSpeed * 1000), true);
+        dv.setInt16(3, Math.round(clampedGrade * 100), true);
+        dv.setUint8(5, Math.round(crr * 10000));
+        dv.setUint8(6, Math.round(cw * 100));
+
+        try {
+            this._writeInFlight = true;
+            this._lastWriteTime = now;
+            this._lastGrade = clampedGrade;
+            await this.controlPoint.writeValue(buf);
+        } catch (e) {
+            console.warn('Failed to set FTMS simulation:', e);
+        } finally {
+            this._writeInFlight = false;
+        }
+    }
+
+    /**
+     * Set target resistance level (Op Code 0x04).
+     * Simpler fallback if Indoor Bike Simulation is not supported.
+     *
+     * @param level — Resistance level 0.0 to 100.0
+     */
+    async setResistance(level: number): Promise<void> {
+        if (!this.controlPoint) return;
+
+        const clampedLevel = Math.max(0, Math.min(100, level));
+
+        // Safety: skip if change is too small
+        if (Math.abs(clampedLevel - this._lastResistance) < BleService.MIN_RESISTANCE_DELTA) return;
+
+        // Safety: rate limit writes
+        const now = Date.now();
+        if (now - this._lastWriteTime < BleService.MIN_WRITE_INTERVAL) return;
+        if (this._writeInFlight) return;
+
+        if (!this.hasControl) await this.requestControl();
+
+        const buf = new ArrayBuffer(3);
+        const dv = new DataView(buf);
+        dv.setUint8(0, 0x04);
+        dv.setInt16(1, Math.round(clampedLevel * 10), true);
+
+        try {
+            this._writeInFlight = true;
+            this._lastWriteTime = now;
+            this._lastResistance = clampedLevel;
+            await this.controlPoint.writeValue(buf);
+        } catch (e) {
+            console.warn('Failed to set FTMS resistance:', e);
+        } finally {
+            this._writeInFlight = false;
+        }
     }
 
     /**
@@ -227,8 +356,23 @@ export class MockBleService extends BleService {
     private _mockDistance = 0;
     private _mockCalories = 0;
     private _startTime = 0;
+    private _mockGrade = 0;
 
     override isBluetoothAvailable() { return true; }
+
+    /**
+     * Mock simulation: adjust power based on grade to simulate effort.
+     * +5% grade → ~50W more, -5% grade → ~50W less.
+     */
+    override async setSimulation(grade: number): Promise<void> {
+        this._mockGrade = grade;
+        console.log(`[Mock] Simulation grade set to ${grade.toFixed(1)}%`);
+    }
+
+    override async setResistance(level: number): Promise<void> {
+        this._mockGrade = level / 5; // rough mapping
+        console.log(`[Mock] Resistance set to ${level.toFixed(1)}`);
+    }
 
     override async connect(): Promise<void> {
         // Simulate connection delay
@@ -247,8 +391,10 @@ export class MockBleService extends BleService {
         // Emit realistic-ish cycling data every second
         this.intervalId = setInterval(() => {
             // Add some randomness to simulate a real ride
+            // Adjust power based on mock grade (simulate climbing effort)
+            const gradeEffect = this._mockGrade * 10; // +10W per 1% grade
             this._mockPower = Math.max(80, Math.min(400,
-                this._mockPower + (Math.random() - 0.48) * 20
+                this._mockPower + (Math.random() - 0.48) * 20 + gradeEffect * 0.1
             ));
             this._mockCadence = Math.max(60, Math.min(110,
                 this._mockCadence + (Math.random() - 0.5) * 4

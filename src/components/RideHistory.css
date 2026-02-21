@@ -1,0 +1,118 @@
+/* ═══════════════════════════════════════
+   Ride History — Modal
+   ═══════════════════════════════════════ */
+
+.history-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: fade-in 0.2s ease-out;
+}
+
+.history-panel {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    width: 560px;
+    max-width: 90vw;
+    max-height: 85vh;
+    overflow-y: auto;
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.history-header h2 {
+    font-size: 20px;
+    font-weight: 800;
+}
+
+/* Totals */
+.history-totals {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.history-total {
+    flex: 1;
+    min-width: 80px;
+    background: var(--surface-1);
+    border-radius: 10px;
+    padding: 12px;
+    text-align: center;
+}
+
+.history-total-value {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.history-total-label {
+    font-size: 10px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+/* Empty */
+.history-empty {
+    text-align: center;
+    padding: 40px 0;
+    color: var(--text-muted);
+}
+
+/* Ride list */
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.history-ride {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px;
+    transition: border-color 0.2s;
+}
+
+.history-ride:hover {
+    border-color: var(--accent);
+}
+
+.history-ride-date {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+}
+
+.history-ride-stats {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.history-ride-knowledge {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+}

@@ -1,0 +1,146 @@
+/* ═══════════════════════════════════════════════
+   Session Summary — End-of-ride card
+   ═══════════════════════════════════════════════ */
+
+.session-summary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: var(--bg-primary);
+    padding: 40px 20px;
+}
+
+.session-summary-card {
+    background: var(--surface-1);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 520px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.session-summary-header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.session-summary-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+}
+
+.session-summary-header h1 {
+    font-family: var(--font-sans);
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.session-summary-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* ─── Stats Grid ─── */
+
+.session-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 28px;
+}
+
+.session-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 16px 8px;
+    gap: 4px;
+}
+
+.session-stat-icon {
+    font-size: 20px;
+}
+
+.session-stat-value {
+    font-family: var(--font-mono);
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--accent);
+}
+
+.session-stat-label {
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+/* ─── Knowledge ─── */
+
+.session-knowledge {
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 28px;
+}
+
+.session-knowledge h3 {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.session-knowledge ul {
+    list-style: none;
+}
+
+.session-knowledge li {
+    font-size: 13px;
+    color: var(--text-secondary);
+    padding: 6px 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+}
+
+.session-knowledge li:last-child {
+    border-bottom: none;
+}
+
+.session-knowledge-cat {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 2px 6px;
+    border-radius: 4px;
+    flex-shrink: 0;
+}
+
+/* ─── Actions ─── */
+
+.session-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* ─── Responsive ─── */
+
+@media (max-width: 480px) {
+    .session-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .session-summary-card {
+        padding: 24px;
+    }
+}

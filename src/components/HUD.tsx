@@ -12,6 +12,8 @@ interface HUDProps {
     status: ConnectionStatus;
     onConnect: () => void;
     onSwitchView: () => void;
+    onEndRide?: () => void;
+    onGoHome?: () => void;
 }
 
 function formatTime(seconds: number): string {
@@ -22,14 +24,14 @@ function formatTime(seconds: number): string {
     return `${m}:${String(s).padStart(2, '0')}`;
 }
 
-export const HUD: React.FC<HUDProps> = ({ data, status, onConnect, onSwitchView }) => {
+export const HUD: React.FC<HUDProps> = ({ data, status, onConnect, onSwitchView, onEndRide, onGoHome }) => {
     return (
         <div className="hud-overlay">
             {/* Top bar */}
             <div className="hud-top">
-                <div className="hud-brand">
+                <div className="hud-brand" onClick={onGoHome} style={{ cursor: onGoHome ? 'pointer' : 'default' }} title="Back to home">
                     <span className="hud-brand-icon">🚴</span>
-                    <span className="hud-brand-name">STOCK RIDER</span>
+                    <span className="hud-brand-name">RIDE</span>
                 </div>
                 <div className="hud-actions">
                     {status === 'disconnected' && (
@@ -40,6 +42,11 @@ export const HUD: React.FC<HUDProps> = ({ data, status, onConnect, onSwitchView 
                     <button className="hud-btn" onClick={onSwitchView}>
                         📊 Dashboard
                     </button>
+                    {onEndRide && (
+                        <button className="hud-btn hud-end-btn" onClick={onEndRide}>
+                            🏁 End Ride
+                        </button>
+                    )}
                 </div>
             </div>
 
