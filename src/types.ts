@@ -43,8 +43,23 @@ export interface StartupInfo {
 
 // ─── App state ───
 
-export type ContentTab = 'news' | 'spotlight' | 'learn';
+export type ContentTab = 'news' | 'spotlight' | 'learn' | 'explorer';
 
 export type RideStyle = 'road' | 'mtb';
 
 export type FactCategory = RideStyle | 'motivation';
+
+// ─── World Explorer types ───
+
+export interface RoutePoint {
+    lat: number;
+    lng: number;
+    elevation: number; // meters above sea level
+}
+
+export interface WorldRoute {
+    name: string;
+    country: string;
+    points: RoutePoint[];
+    totalDistance: number; // meters
+}

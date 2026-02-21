@@ -172,6 +172,29 @@ export class WebLLMService {
     }
 
     /**
+     * Generate a fun fact about a city from its Wikipedia summary.
+     */
+    async generateCityFact(cityName: string, summary: string): Promise<string | null> {
+        if (!this.isAvailable() || !this.engine) return null;
+
+        try {
+            const reply = await this.engine.chat.completions.create({
+                messages: [
+                    { role: 'system', content: 'You generate one short, interesting fact about a city for a cyclist exploring the world. Rules: 1) Always state facts as STATEMENTS, never as questions. 2) Keep it to 1 sentence, under 25 words. 3) Be surprising and fun. 4) No intro or prefix, just the fact itself.' },
+                    { role: 'user', content: `City: ${cityName}\nContext: ${summary.substring(0, 300)}\nGenerate one surprising fact:` },
+                ],
+                max_tokens: 50,
+                temperature: 0.9,
+                top_p: 0.95,
+            });
+            return reply.choices?.[0]?.message?.content?.trim() || null;
+        } catch (err) {
+            console.warn('[WebLLM] City fact generation failed:', err);
+            return null;
+        }
+    }
+
+    /**
      * Dispose the engine and free GPU resources.
      */
     async dispose(): Promise<void> {
