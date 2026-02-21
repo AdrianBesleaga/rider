@@ -86,10 +86,15 @@ export const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose 
                 <section className="settings-section">
                     <h3>🔗 Connection</h3>
                     <label className="settings-toggle">
-                        <span>Use mock trainer (demo mode)</span>
-                        <input type="checkbox" checked={settings.useMockBle} onChange={() => toggle('useMockBle')} />
+                        <span>Use real Bluetooth trainer</span>
+                        <input type="checkbox" checked={!settings.useMockBle} onChange={() => toggle('useMockBle')} />
                         <span className="settings-switch" />
                     </label>
+                    <p className="settings-hint" style={{ fontSize: 12, color: 'var(--text-muted)', margin: '4px 0 12px', lineHeight: 1.4 }}>
+                        {settings.useMockBle
+                            ? '🎮 Demo mode — simulated cycling data is generated automatically.'
+                            : '📡 Real mode — pairs with your Bluetooth trainer via Web Bluetooth API.'}
+                    </p>
                     <label className="settings-toggle">
                         <span>Use mock data feeds</span>
                         <input type="checkbox" checked={settings.useMockData} onChange={() => toggle('useMockData')} />

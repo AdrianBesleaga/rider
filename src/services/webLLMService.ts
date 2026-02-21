@@ -178,6 +178,9 @@ export class WebLLMService {
         if (!this.isAvailable() || !this.engine) return null;
 
         try {
+            // Reset chat to avoid WASM tokenizer state buildup
+            await this.engine.resetChat();
+
             const reply = await this.engine.chat.completions.create({
                 messages: [
                     { role: 'system', content: 'You generate one short, interesting fact about a city for a cyclist exploring the world. Rules: 1) Always state facts as STATEMENTS, never as questions. 2) Keep it to 1 sentence, under 25 words. 3) Be surprising and fun. 4) No intro or prefix, just the fact itself.' },
@@ -189,7 +192,22 @@ export class WebLLMService {
             });
             return reply.choices?.[0]?.message?.content?.trim() || null;
         } catch (err) {
-            console.warn('[WebLLM] City fact generation failed:', err);
+            const msg = err instanceof Error ? err.message : String(err);
+
+            // WASM BindingError: tokenizer corrupted — reinitialize engine
+            if (msg.includes('BindingError') || msg.includes('VectorInt')) {
+                console.warn('[WebLLM] WASM binding corrupted — reinitializing engine…');
+                try {
+                    await this.engine.unload();
+                } catch { /* ignore */ }
+                this.engine = null;
+                this._status = 'idle';
+                // Re-init in background — next call will succeed
+                this.init();
+                return null;
+            }
+
+            console.warn('[WebLLM] City fact generation failed:', msg);
             return null;
         }
     }

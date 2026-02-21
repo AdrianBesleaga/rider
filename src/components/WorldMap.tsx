@@ -49,9 +49,11 @@ export const WorldMap: React.FC<WorldMapProps> = ({
         const map = L.map(mapRef.current, {
             center: [riderLat || 0, riderLng || 0],
             zoom: 14,
-            zoomControl: true,
+            zoomControl: false,
             attributionControl: true,
         });
+
+        L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         L.tileLayer(TILE_URL, {
             attribution: TILE_ATTR,

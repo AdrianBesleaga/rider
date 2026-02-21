@@ -8,11 +8,14 @@ interface MapViewProps {
     riderPos: RiderPosition;
     cyclingData: CyclingData;
     grade: number;
+    virtualGear: number;
     speedMultiplier: number;
     facts: string[];
     factIndex: number;
     isAIFacts: boolean;
     onSetSpeed: (fn: (m: number) => number) => void;
+    onShiftUp: () => void;
+    onShiftDown: () => void;
     onBack: () => void;
 }
 
@@ -35,8 +38,8 @@ const STAT_ITEMS = [
 ];
 
 export const MapView: React.FC<MapViewProps> = ({
-    worldRoute, riderPos, cyclingData, grade, speedMultiplier,
-    facts, factIndex, isAIFacts, onSetSpeed, onBack,
+    worldRoute, riderPos, cyclingData, grade, virtualGear, speedMultiplier,
+    facts, factIndex, isAIFacts, onSetSpeed, onShiftUp, onShiftDown, onBack,
 }) => {
     return (
         <div style={{ width: '100vw', height: '100vh', position: 'relative', background: 'var(--bg-primary)' }}>
@@ -53,7 +56,7 @@ export const MapView: React.FC<MapViewProps> = ({
 
             {/* Speed HUD — top center */}
             <div style={{
-                position: 'absolute', top: 16, left: '50%', transform: 'translateX(-50%)', zIndex: 1000,
+                position: 'absolute', top: 64, left: '50%', transform: 'translateX(-50%)', zIndex: 1000,
                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
                 background: 'rgba(10,14,23,0.75)', backdropFilter: 'blur(10px)',
                 border: '1px solid rgba(0,194,255,0.2)', borderRadius: 16,
@@ -73,14 +76,14 @@ export const MapView: React.FC<MapViewProps> = ({
                     </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <button onClick={() => onSetSpeed(m => Math.max(1, m / 2))} style={{
+                    <button onClick={() => onSetSpeed(m => Math.max(1, m - 10))} style={{
                         background: 'none', border: '1px solid rgba(0,194,255,0.3)', borderRadius: 4,
                         color: 'var(--accent)', width: 24, height: 24, fontSize: 14, cursor: 'pointer',
                     }}>−</button>
                     <span style={{ color: 'var(--text-muted)', fontSize: 11, fontWeight: 700, fontFamily: 'var(--font-mono)', minWidth: 34, textAlign: 'center' }}>
                         ×{speedMultiplier}
                     </span>
-                    <button onClick={() => onSetSpeed(m => Math.min(1000, m * 2))} style={{
+                    <button onClick={() => onSetSpeed(m => Math.min(100, m + 10))} style={{
                         background: 'none', border: '1px solid rgba(0,194,255,0.3)', borderRadius: 4,
                         color: 'var(--accent)', width: 24, height: 24, fontSize: 14, cursor: 'pointer',
                     }}>+</button>
@@ -104,19 +107,38 @@ export const MapView: React.FC<MapViewProps> = ({
                 ))}
             </div>
 
-            {/* Back button */}
-            <button
-                onClick={onBack}
-                style={{
-                    position: 'absolute', top: 16, left: 16, zIndex: 1000,
-                    background: 'rgba(10,14,23,0.8)', backdropFilter: 'blur(8px)',
-                    border: '1px solid rgba(0,194,255,0.15)', borderRadius: 8,
-                    padding: '8px 14px', color: 'var(--accent)', fontFamily: 'var(--font-mono)',
-                    fontSize: 12, fontWeight: 600, cursor: 'pointer',
-                }}
-            >
-                ← Dashboard
-            </button>
+
+
+            {/* Virtual Gear Shifter */}
+            <div style={{
+                position: 'absolute', bottom: 80, left: 16, zIndex: 1000,
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4,
+                background: 'rgba(10,14,23,0.85)', backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(0,194,255,0.2)', borderRadius: 12,
+                padding: '8px 12px',
+            }}>
+                <button onClick={onShiftUp} style={{
+                    background: 'none', border: '1px solid rgba(0,194,255,0.3)', borderRadius: 6,
+                    color: 'var(--accent)', width: 36, height: 28, fontSize: 16, cursor: 'pointer',
+                    opacity: virtualGear >= 12 ? 0.3 : 1,
+                }}>▲</button>
+                <div style={{ textAlign: 'center', fontFamily: 'var(--font-mono)' }}>
+                    <div style={{
+                        fontSize: 24, fontWeight: 900, color: 'var(--accent)',
+                        textShadow: '0 0 12px rgba(0,194,255,0.4)',
+                    }}>
+                        {virtualGear}
+                    </div>
+                    <div style={{ fontSize: 8, color: 'var(--text-muted)', letterSpacing: 1.5, textTransform: 'uppercase' }}>
+                        GEAR
+                    </div>
+                </div>
+                <button onClick={onShiftDown} style={{
+                    background: 'none', border: '1px solid rgba(0,194,255,0.3)', borderRadius: 6,
+                    color: 'var(--accent)', width: 36, height: 28, fontSize: 16, cursor: 'pointer',
+                    opacity: virtualGear <= 1 ? 0.3 : 1,
+                }}>▼</button>
+            </div>
 
             {/* Facts Panel */}
             {worldRoute && (() => {

@@ -55,6 +55,16 @@ export class BleService {
         this.onDataCallbacks.forEach(cb => cb(data));
     }
 
+    // ─── BLE write safety: rate limit + min delta ───
+    private _lastWriteTime = 0;
+    private _lastGrade = 0;
+    private _lastResistance = 0;
+    private _writeInFlight = false;
+    private static readonly MIN_WRITE_INTERVAL = 2000; // ms between writes
+    private static readonly MIN_GRADE_DELTA = 0.5;      // % change to trigger write
+    private static readonly MIN_RESISTANCE_DELTA = 1;    // level change to trigger write
+    private static readonly MAX_GRADE = 20;              // cap at ±20%
+
     /**
      * Check if Web Bluetooth is available in the current browser
      */
@@ -173,21 +183,38 @@ export class BleService {
      */
     async setSimulation(grade: number, windSpeed = 0, crr = 0.004, cw = 0.51): Promise<void> {
         if (!this.controlPoint) return;
+
+        // Safety: clamp grade
+        const clampedGrade = Math.max(-BleService.MAX_GRADE, Math.min(BleService.MAX_GRADE, grade));
+
+        // Safety: skip if change is too small
+        if (Math.abs(clampedGrade - this._lastGrade) < BleService.MIN_GRADE_DELTA) return;
+
+        // Safety: rate limit writes
+        const now = Date.now();
+        if (now - this._lastWriteTime < BleService.MIN_WRITE_INTERVAL) return;
+        if (this._writeInFlight) return;
+
         if (!this.hasControl) await this.requestControl();
 
         // FTMS spec: Op Code (1) + Wind Speed (2) + Grade (2) + Crr (1) + Cw (1) = 7 bytes
         const buf = new ArrayBuffer(7);
         const dv = new DataView(buf);
-        dv.setUint8(0, 0x11); // Set Indoor Bike Simulation Parameters
-        dv.setInt16(1, Math.round(windSpeed * 1000), true);      // 0.001 m/s resolution
-        dv.setInt16(3, Math.round(grade * 100), true);           // 0.01% resolution
-        dv.setUint8(5, Math.round(crr * 10000));                 // 0.0001 resolution
-        dv.setUint8(6, Math.round(cw * 100));                    // 0.01 resolution
+        dv.setUint8(0, 0x11);
+        dv.setInt16(1, Math.round(windSpeed * 1000), true);
+        dv.setInt16(3, Math.round(clampedGrade * 100), true);
+        dv.setUint8(5, Math.round(crr * 10000));
+        dv.setUint8(6, Math.round(cw * 100));
 
         try {
+            this._writeInFlight = true;
+            this._lastWriteTime = now;
+            this._lastGrade = clampedGrade;
             await this.controlPoint.writeValue(buf);
         } catch (e) {
             console.warn('Failed to set FTMS simulation:', e);
+        } finally {
+            this._writeInFlight = false;
         }
     }
 
@@ -199,17 +226,33 @@ export class BleService {
      */
     async setResistance(level: number): Promise<void> {
         if (!this.controlPoint) return;
+
+        const clampedLevel = Math.max(0, Math.min(100, level));
+
+        // Safety: skip if change is too small
+        if (Math.abs(clampedLevel - this._lastResistance) < BleService.MIN_RESISTANCE_DELTA) return;
+
+        // Safety: rate limit writes
+        const now = Date.now();
+        if (now - this._lastWriteTime < BleService.MIN_WRITE_INTERVAL) return;
+        if (this._writeInFlight) return;
+
         if (!this.hasControl) await this.requestControl();
 
         const buf = new ArrayBuffer(3);
         const dv = new DataView(buf);
-        dv.setUint8(0, 0x04); // Set Target Resistance Level
-        dv.setInt16(1, Math.round(Math.max(0, Math.min(100, level)) * 10), true); // 0.1 resolution
+        dv.setUint8(0, 0x04);
+        dv.setInt16(1, Math.round(clampedLevel * 10), true);
 
         try {
+            this._writeInFlight = true;
+            this._lastWriteTime = now;
+            this._lastResistance = clampedLevel;
             await this.controlPoint.writeValue(buf);
         } catch (e) {
             console.warn('Failed to set FTMS resistance:', e);
+        } finally {
+            this._writeInFlight = false;
         }
     }
 

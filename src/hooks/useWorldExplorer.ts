@@ -1,6 +1,5 @@
 import { useState, useEffect, useRef, MutableRefObject } from 'react';
 import { WorldRoute, CyclingData } from '../types';
-import { BleService } from '../services/bleService';
 import { WebLLMService } from '../services/webLLMService';
 import { getRandomLocation, fetchRoute, interpolatePosition, gradeAtIndex } from '../services/worldRoutes';
 
@@ -15,7 +14,6 @@ export interface RiderPosition {
 interface UseWorldExplorerOptions {
     active: boolean;
     cyclingData: CyclingData;
-    bleRef: MutableRefObject<BleService | null>;
     aiServiceRef: MutableRefObject<WebLLMService | null>;
 }
 
@@ -23,17 +21,20 @@ interface UseWorldExplorerOptions {
  * Manages world exploration: route loading, rider position advancement,
  * Wikipedia context fetching, and AI fact generation.
  */
-export function useWorldExplorer({ active, cyclingData, bleRef, aiServiceRef }: UseWorldExplorerOptions) {
+export function useWorldExplorer({ active, cyclingData, aiServiceRef }: UseWorldExplorerOptions) {
     const [worldRoute, setWorldRoute] = useState<WorldRoute | null>(null);
     const [explorerDist, setExplorerDist] = useState(0);
     const [riderPos, setRiderPos] = useState<RiderPosition>({ index: 0, lat: 0, lng: 0, elevation: 0, progress: 0 });
-    const [speedMultiplier, setSpeedMultiplier] = useState(10);
+    const [speedMultiplier, setSpeedMultiplier] = useState(1);
     const [currentGrade, setCurrentGrade] = useState(0);
 
     // AI facts state
     const [factIndex, setFactIndex] = useState(0);
     const [aiFacts, setAiFacts] = useState<string[]>([]);
     const [wikiSummary, setWikiSummary] = useState('');
+
+    // Virtual gear: 1 (easiest) to 12 (hardest)
+    const [virtualGear, setVirtualGear] = useState(6);
 
     // ─── Load route on ride start ───
     useEffect(() => {
@@ -74,14 +75,11 @@ export function useWorldExplorer({ active, cyclingData, bleRef, aiServiceRef }: 
             setRiderPos(pos);
             setExplorerDist(distRef.current);
 
-            // Throttle grade + BLE to once per second
+            // Update grade for display (once per second)
             if (now - lastGradeTime > 1000) {
                 lastGradeTime = now;
                 const grade = gradeAtIndex(worldRoute.points, pos.index);
                 setCurrentGrade(grade);
-                if (bleRef.current && Math.abs(grade) > 0.1) {
-                    bleRef.current.setSimulation(grade);
-                }
             }
 
             rafId = requestAnimationFrame(tick);
@@ -153,6 +151,9 @@ export function useWorldExplorer({ active, cyclingData, bleRef, aiServiceRef }: 
         ? Math.min(factIndex, facts.length - 1)
         : (facts.length > 0 ? factIndex % facts.length : 0);
 
+    const shiftUp = () => setVirtualGear(g => Math.min(12, g + 1));
+    const shiftDown = () => setVirtualGear(g => Math.max(1, g - 1));
+
     const reset = () => {
         setWorldRoute(null);
         setExplorerDist(0);
@@ -165,6 +166,9 @@ export function useWorldExplorer({ active, cyclingData, bleRef, aiServiceRef }: 
         worldRoute,
         riderPos,
         currentGrade,
+        virtualGear,
+        shiftUp,
+        shiftDown,
         speedMultiplier,
         setSpeedMultiplier,
         facts,
