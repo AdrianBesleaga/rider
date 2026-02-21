@@ -21,31 +21,32 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartRide, onStartDe
 
     return (
         <div className="landing">
+            {/* Sticky Nav */}
+            <nav className="landing-nav">
+                <div className="landing-brand" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
+                    <span className="landing-brand-icon">🚴</span>
+                    <span className="landing-brand-name">RIDE</span>
+                </div>
+                <div className="landing-nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#how">How It Works</a>
+                    <a href="#pricing">Pricing</a>
+                </div>
+            </nav>
+
             {/* Hero Section */}
             <section className="landing-hero">
                 <div className="landing-hero-bg" />
-                <nav className="landing-nav">
-                    <div className="landing-brand">
-                        <span className="landing-brand-icon">🚴</span>
-                        <span className="landing-brand-name">STOCK RIDER</span>
-                    </div>
-                    <div className="landing-nav-links">
-                        <a href="#features">Features</a>
-                        <a href="#how">How It Works</a>
-                        <a href="#pricing">Pricing</a>
-                    </div>
-                </nav>
-
                 <div className="landing-hero-content">
-                    <div className="landing-hero-badge">🧠 EXERCISE BODY + MIND</div>
+                    <div className="landing-hero-badge">🧠 TRAIN BODY + MIND</div>
                     <h1 className="landing-hero-title">
                         Ride Smart.<br />
                         <span className="landing-hero-accent">Learn While You Burn.</span>
                     </h1>
                     <p className="landing-hero-subtitle">
-                        The indoor cycling app for founders and busy professionals.
-                        Consume live market data, AI news, and tech insights while
-                        you train — because your time is too valuable for just pedaling.
+                        The indoor cycling app with an AI coach and personalized content.
+                        News, learning, and real-time coaching while you ride —
+                        because your time is too valuable for just pedaling.
                     </p>
                     <div className="landing-hero-actions">
                         <button className="landing-btn-primary" onClick={onStartRide}>
@@ -75,17 +76,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartRide, onStartDe
 
             {/* Features */}
             <section className="landing-features" id="features">
-                <h2 className="landing-section-title">Why Stock Rider?</h2>
+                <h2 className="landing-section-title">Why Ride?</h2>
                 <div className="landing-features-grid">
                     <div className="landing-feature-card">
-                        <div className="landing-feature-icon">📈</div>
-                        <h3>Live Market Data</h3>
-                        <p>Watch crypto, stocks, and financial markets update in real-time as you ride through a cyberpunk 3D world.</p>
+                        <div className="landing-feature-icon">🧠</div>
+                        <h3>AI Coach</h3>
+                        <p>In-browser AI coach powered by WebLLM gives you real-time personalized feedback based on your power, heart rate, and cadence.</p>
                     </div>
                     <div className="landing-feature-card">
                         <div className="landing-feature-icon">📰</div>
-                        <h3>Tech & AI News</h3>
-                        <p>Auto-curated feeds from TechCrunch, Ars Technica, CoinDesk — summarized into ride-friendly chunks.</p>
+                        <h3>Your News Feed</h3>
+                        <p>RSS feeds from your favorite sources — tech, sports, business, anything — delivered as you ride through a cyberpunk world.</p>
                     </div>
                     <div className="landing-feature-card">
                         <div className="landing-feature-icon">🚀</div>
@@ -122,8 +123,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartRide, onStartDe
                     <div className="landing-step-arrow">→</div>
                     <div className="landing-step">
                         <div className="landing-step-number">2</div>
-                        <h3>Choose Your Content</h3>
-                        <p>Pick from markets, tech news, AI updates, or let the algorithm curate your feed.</p>
+                        <h3>Choose Your Interests</h3>
+                        <p>Pick your RSS feeds — tech, sports, science, business — or let the AI curate your ride.</p>
                     </div>
                     <div className="landing-step-arrow">→</div>
                     <div className="landing-step">
@@ -145,7 +146,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartRide, onStartDe
                         <ul className="landing-price-features">
                             <li>✓ 3D cyberpunk ride scene</li>
                             <li>✓ Basic cycling metrics</li>
-                            <li>✓ 2 data feeds (crypto + news)</li>
+                            <li>✓ News feeds (RSS)</li>
                             <li>✓ Session summary</li>
                             <li className="landing-price-disabled">✗ All data feeds</li>
                             <li className="landing-price-disabled">✗ OBS overlay</li>
@@ -204,11 +205,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStartRide, onStartDe
             {/* Footer */}
             <footer className="landing-footer">
                 <div className="landing-footer-brand">
-                    🚴 Stock Rider — by <a href="https://piwi.ai" target="_blank" rel="noopener">piwi.ai</a>
+                    🚴 PIWI Ride — by <a href="https://piwi.ai" target="_blank" rel="noopener">piwi.ai</a>
                 </div>
                 <div className="landing-footer-links">
-                    <a href="https://github.com/AdrianBesleaga/stock-rider" target="_blank" rel="noopener">GitHub</a>
-                    <span>·</span>
                     <a href="#">Privacy</a>
                     <span>·</span>
                     <a href="#">Terms</a>

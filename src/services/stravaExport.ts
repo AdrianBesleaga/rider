@@ -8,27 +8,27 @@
 import { CyclingData, PowerSample } from '../types';
 
 interface RideData {
-    cyclingData: CyclingData;
-    powerSamples: PowerSample[];
-    startTime: Date;
+  cyclingData: CyclingData;
+  powerSamples: PowerSample[];
+  startTime: Date;
 }
 
 function pad(n: number): string {
-    return String(n).padStart(2, '0');
+  return String(n).padStart(2, '0');
 }
 
 function toIso(date: Date): string {
-    return date.toISOString();
+  return date.toISOString();
 }
 
 export function generateTcx(ride: RideData): string {
-    const { cyclingData, powerSamples, startTime } = ride;
-    const endTime = new Date(startTime.getTime() + cyclingData.elapsedTime * 1000);
+  const { cyclingData, powerSamples, startTime } = ride;
+  const endTime = new Date(startTime.getTime() + cyclingData.elapsedTime * 1000);
 
-    // Build trackpoints from power samples
-    const trackpoints = powerSamples.map((sample) => {
-        const time = new Date(startTime.getTime() + sample.time * 1000);
-        return `        <Trackpoint>
+  // Build trackpoints from power samples
+  const trackpoints = powerSamples.map((sample) => {
+    const time = new Date(startTime.getTime() + sample.time * 1000);
+    return `        <Trackpoint>
           <Time>${toIso(time)}</Time>
           <HeartRateBpm><Value>${cyclingData.heartRate}</Value></HeartRateBpm>
           <Cadence>${cyclingData.cadence}</Cadence>
@@ -39,9 +39,9 @@ export function generateTcx(ride: RideData): string {
             </ns3:TPX>
           </Extensions>
         </Trackpoint>`;
-    });
+  });
 
-    const tcx = `<?xml version="1.0" encoding="UTF-8"?>
+  const tcx = `<?xml version="1.0" encoding="UTF-8"?>
 <TrainingCenterDatabase
   xmlns="http://www.garmin.com/xmlschemas/TrainingCenterDatabase/v2"
   xmlns:ns3="http://www.garmin.com/xmlschemas/ActivityExtension/v2">
@@ -66,25 +66,25 @@ ${trackpoints.join('\n')}
         </Extensions>
       </Lap>
       <Creator>
-        <Name>Stock Rider</Name>
+        <Name>PIWI Ride</Name>
       </Creator>
     </Activity>
   </Activities>
 </TrainingCenterDatabase>`;
 
-    return tcx;
+  return tcx;
 }
 
 export function downloadTcx(ride: RideData): void {
-    const tcx = generateTcx(ride);
-    const blob = new Blob([tcx], { type: 'application/vnd.garmin.tcx+xml' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const dateStr = ride.startTime.toISOString().split('T')[0];
-    a.href = url;
-    a.download = `stock-rider-${dateStr}.tcx`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+  const tcx = generateTcx(ride);
+  const blob = new Blob([tcx], { type: 'application/vnd.garmin.tcx+xml' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateStr = ride.startTime.toISOString().split('T')[0];
+  a.href = url;
+  a.download = `piwi-ride-${dateStr}.tcx`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
 }

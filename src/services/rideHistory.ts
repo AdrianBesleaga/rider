@@ -20,7 +20,7 @@ export interface RideRecord {
     topTopics: string[];     // category labels
 }
 
-const STORAGE_KEY = 'stockrider_history';
+const STORAGE_KEY = 'piwi_ride_history';
 
 export function getRideHistory(): RideRecord[] {
     try {

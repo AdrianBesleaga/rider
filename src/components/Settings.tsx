@@ -6,6 +6,7 @@ export interface AppSettings {
     useMockData: boolean;
     useMockBle: boolean;
     rideStyle: RideStyle;
+    aiCoach: boolean;
     voiceBriefing: boolean;
     obsOverlay: boolean;
     customFeeds: string[];
@@ -20,6 +21,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
     useMockData: false,
     useMockBle: true,
     rideStyle: 'road',
+    aiCoach: false,
     voiceBriefing: false,
     obsOverlay: false,
     customFeeds: [],
@@ -116,6 +118,11 @@ export const Settings: React.FC<SettingsProps> = ({ settings, onUpdate, onClose 
                 {/* Features */}
                 <section className="settings-section">
                     <h3>🎯 Features</h3>
+                    <label className="settings-toggle">
+                        <span>🧠 AI Coach (in-browser, requires WebGPU)</span>
+                        <input type="checkbox" checked={settings.aiCoach} onChange={() => toggle('aiCoach')} />
+                        <span className="settings-switch" />
+                    </label>
                     <label className="settings-toggle">
                         <span>Voice briefing (TTS reads news)</span>
                         <input type="checkbox" checked={settings.voiceBriefing} onChange={() => toggle('voiceBriefing')} />

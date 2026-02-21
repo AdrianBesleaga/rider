@@ -39,15 +39,15 @@ export const SessionSummary: React.FC<SessionSummaryProps> = ({
 
     const handleShare = async () => {
         const text = [
-            `🚴 Stock Rider Session`,
+            `🚴 PIWI Ride Session`,
             `⏱️ ${formatDuration(data.elapsedTime)} | 🔥 ${Math.round(data.calories)} kcal | 📏 ${formatDistance(data.distance)}`,
             `📰 Learned about: ${newsConsumed.slice(0, 3).map(n => n.title.slice(0, 50)).join(', ')}`,
-            `\nExercise your body AND your mind → stockrider.app`,
+            `\nTrain your body and your mind → ride.piwi.ai`,
         ].join('\n');
 
         if (navigator.share) {
             try {
-                await navigator.share({ title: 'Stock Rider Session', text });
+                await navigator.share({ title: 'PIWI Ride Session', text });
             } catch { /* user cancelled */ }
         } else {
             await navigator.clipboard.writeText(text);

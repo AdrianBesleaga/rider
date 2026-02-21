@@ -1,55 +1,13 @@
 /**
- * Data Service — Real API calls with mock fallback
+ * Data Service — RSS news fetching
  *
- * Fetches crypto prices from CoinGecko (free) and news from RSS feeds.
- * If APIs are unreachable, automatically falls back to mock data.
+ * Fetches news from RSS feeds via a free CORS proxy.
+ * Falls back to mock data if feeds are unreachable.
  */
 
-import { CryptoTicker, NewsItem } from '../types';
+import { NewsItem } from '../types';
 import { API } from './apiConfig';
-import { getCryptoTickers as getMockCrypto, getNewsItems as getMockNews } from './mockData';
-
-// ─── Crypto (CoinGecko) ───
-
-interface CoinGeckoMarket {
-    id: string;
-    symbol: string;
-    name: string;
-    current_price: number;
-    price_change_percentage_24h: number;
-    sparkline_in_7d?: { price: number[] };
-}
-
-export async function fetchCryptoTickers(): Promise<CryptoTicker[]> {
-    if (API.useMock) return getMockCrypto();
-
-    try {
-        const params = new URLSearchParams({
-            vs_currency: 'usd',
-            ids: API.crypto.ids.join(','),
-            order: 'market_cap_desc',
-            sparkline: 'true',
-            price_change_percentage: '24h',
-        });
-
-        const res = await fetch(`${API.crypto.marketsUrl}?${params}`);
-        if (!res.ok) throw new Error(`CoinGecko ${res.status}`);
-
-        const data: CoinGeckoMarket[] = await res.json();
-
-        return data.map((coin) => ({
-            id: coin.id,
-            symbol: coin.symbol.toUpperCase(),
-            name: coin.name,
-            price: coin.current_price,
-            change24h: Math.round((coin.price_change_percentage_24h ?? 0) * 100) / 100,
-            sparkline: coin.sparkline_in_7d?.price.slice(-24) ?? [],
-        }));
-    } catch (err) {
-        console.warn('⚡ CoinGecko unavailable, using mock:', err);
-        return getMockCrypto();
-    }
-}
+import { getNewsItems as getMockNews } from './mockData';
 
 // ─── News (RSS → JSON) ───
 
@@ -118,6 +76,7 @@ export async function fetchNewsItems(): Promise<NewsItem[]> {
         }
 
         if (allItems.length === 0) throw new Error('No news items returned');
+        console.log(`[News] Fetched ${allItems.length} items from ${API.news.feeds.length} RSS feeds`);
         return allItems.sort(
             (a, b) => (a.publishedAt > b.publishedAt ? 1 : -1),
         );

@@ -1,28 +1,26 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { CyclingData, ConnectionStatus, PowerSample, ContentTab, NewsItem } from './types';
 import { createBleService, BleService } from './services/bleService';
-import { fetchCryptoTickers, fetchNewsItems } from './services/dataService';
-import { getCryptoTickers as getMockCrypto, getStockQuotes, getNewsItems as getMockNews } from './services/mockData';
-import { API } from './services/apiConfig';
+import { fetchNewsItems } from './services/dataService';
+import { getNewsItems as getMockNews } from './services/mockData';
 import { saveRide, getRideHistory, RideRecord } from './services/rideHistory';
 import { downloadTcx } from './services/stravaExport';
 import { startVoiceBriefing, stopVoiceBriefing } from './services/voiceBriefing';
-import { CryptoTickerBar } from './components/CryptoTicker';
 import { CyclingMetrics } from './components/CyclingMetrics';
 import { PowerGraph } from './components/PowerGraph';
-import { StockChart } from './components/StockChart';
 import { NewsFeed } from './components/NewsFeed';
 import { RiderScene } from './components/RiderScene';
 import { HUD } from './components/HUD';
 import { LandingPage } from './components/LandingPage';
 import { SessionSummary } from './components/SessionSummary';
-import { PodcastPlayer } from './components/PodcastPlayer';
 import { Flashcards } from './components/Flashcards';
 import { HRZones } from './components/HRZones';
 import { FounderDashboard } from './components/FounderDashboard';
 import { Settings, AppSettings, DEFAULT_SETTINGS } from './components/Settings';
 import { RideHistory } from './components/RideHistory';
 import { MotivationalBanner } from './components/MotivationalBanner';
+import { AILoadingOverlay } from './components/AILoadingOverlay';
+import { WebLLMService, WebLLMProgress } from './services/webLLMService';
 
 type AppView = 'landing' | 'dashboard' | 'rider3d' | 'summary';
 
@@ -48,11 +46,8 @@ export const App: React.FC = () => {
     const rideStartRef = useRef<Date>(new Date());
 
     // ─── Data feed state ───
-    const [cryptoTickers, setCryptoTickers] = useState(getMockCrypto());
-    const [stockQuotes, setStockQuotes] = useState(getStockQuotes());
     const [newsItems, setNewsItems] = useState<NewsItem[]>(getMockNews());
-    const [selectedStock, setSelectedStock] = useState('NVDA');
-    const [activeTab, setActiveTab] = useState<ContentTab>('charts');
+    const [activeTab, setActiveTab] = useState<ContentTab>('news');
 
     // ─── Track news consumed during ride ───
     const [newsConsumed, setNewsConsumed] = useState<NewsItem[]>([]);
@@ -60,7 +55,7 @@ export const App: React.FC = () => {
     // ─── Settings & modals ───
     const [settings, setSettings] = useState<AppSettings>(() => {
         try {
-            const saved = localStorage.getItem('stockrider_settings');
+            const saved = localStorage.getItem('piwi_ride_settings');
             return saved ? { ...DEFAULT_SETTINGS, ...JSON.parse(saved) } : DEFAULT_SETTINGS;
         } catch { return DEFAULT_SETTINGS; }
     });
@@ -68,51 +63,52 @@ export const App: React.FC = () => {
     const [showHistory, setShowHistory] = useState(false);
     const [rideHistory, setRideHistory] = useState<RideRecord[]>(getRideHistory());
 
+    // ─── AI Coach state ───
+    const aiServiceRef = useRef<WebLLMService | null>(null);
+    const [aiProgress, setAiProgress] = useState<WebLLMProgress>({
+        status: 'idle', progress: 0, message: '',
+    });
+
     // Persist settings
     useEffect(() => {
-        try { localStorage.setItem('stockrider_settings', JSON.stringify(settings)); } catch { /* noop */ }
+        try { localStorage.setItem('piwi_ride_settings', JSON.stringify(settings)); } catch { /* noop */ }
     }, [settings]);
 
-    // ─── Fetch real data when not using mock ───
+    // ─── Init / dispose AI Coach ───
     useEffect(() => {
-        if (settings.useMockData) return;
+        if (settings.aiCoach) {
+            const service = new WebLLMService({
+                onProgress: setAiProgress,
+            });
+            aiServiceRef.current = service;
+            service.init();
 
-        fetchCryptoTickers().then(setCryptoTickers).catch(console.error);
+            return () => {
+                service.dispose();
+                aiServiceRef.current = null;
+                setAiProgress({ status: 'idle', progress: 0, message: '' });
+            };
+        } else {
+            // Dispose existing service when toggled off
+            if (aiServiceRef.current) {
+                aiServiceRef.current.dispose();
+                aiServiceRef.current = null;
+                setAiProgress({ status: 'idle', progress: 0, message: '' });
+            }
+        }
+    }, [settings.aiCoach]);
+
+    // ─── Fetch news on mount ───
+    useEffect(() => {
+        if (settings.useMockData) {
+            setNewsConsumed(getMockNews());
+            return;
+        }
+        console.log('[News] Fetching RSS feeds…');
         fetchNewsItems().then((items) => {
             setNewsItems(items);
             setNewsConsumed(items);
         }).catch(console.error);
-
-        const cryptoInterval = setInterval(() => {
-            fetchCryptoTickers().then(setCryptoTickers).catch(console.error);
-        }, API.crypto.interval);
-
-        const newsInterval = setInterval(() => {
-            fetchNewsItems().then((items) => {
-                setNewsItems(items);
-                setNewsConsumed(prev => {
-                    const existing = new Set(prev.map(n => n.id));
-                    const newOnes = items.filter(n => !existing.has(n.id));
-                    return [...prev, ...newOnes];
-                });
-            }).catch(console.error);
-        }, API.news.interval);
-
-        return () => {
-            clearInterval(cryptoInterval);
-            clearInterval(newsInterval);
-        };
-    }, [settings.useMockData]);
-
-    // ─── Mock data fallback ───
-    useEffect(() => {
-        if (!settings.useMockData) return;
-        setNewsConsumed(getMockNews());
-        const interval = setInterval(() => {
-            setCryptoTickers(getMockCrypto());
-            setStockQuotes(getStockQuotes());
-        }, 3000);
-        return () => clearInterval(interval);
     }, [settings.useMockData]);
 
     // ─── Voice briefing ───
@@ -232,8 +228,6 @@ export const App: React.FC = () => {
             <div className={`app${obsClass}`} style={{ position: 'relative' }}>
                 <RiderScene
                     cyclingData={cyclingData}
-                    cryptoTickers={cryptoTickers}
-                    stockQuotes={stockQuotes}
                     newsItems={newsItems}
                     rideStyle={settings.rideStyle}
                 />
@@ -243,12 +237,14 @@ export const App: React.FC = () => {
                     onConnect={handleConnect}
                     onSwitchView={() => setView('dashboard')}
                     onEndRide={handleEndRide}
+                    onGoHome={() => { setCyclingData(INITIAL_CYCLING_DATA); setPowerSamples([]); setNewsConsumed([]); setView('landing'); }}
                 />
-                {/* Compact podcast player in HUD */}
-                <div className="hud-podcast-slot">
-                    <PodcastPlayer compact />
-                </div>
-                <MotivationalBanner rideStyle={settings.rideStyle} />
+                <MotivationalBanner
+                    rideStyle={settings.rideStyle}
+                    cyclingData={cyclingData}
+                    aiService={aiServiceRef.current}
+                />
+                <AILoadingOverlay progress={aiProgress} />
                 {showSettings && <Settings settings={settings} onUpdate={setSettings} onClose={() => setShowSettings(false)} />}
                 {showHistory && <RideHistory history={rideHistory} onClose={() => setShowHistory(false)} />}
             </div>
@@ -260,13 +256,10 @@ export const App: React.FC = () => {
         <div className={`app${obsClass}`}>
             {/* Top Bar */}
             <header className="top-bar">
-                <div className="brand">
+                <div className="brand" onClick={() => { setCyclingData(INITIAL_CYCLING_DATA); setPowerSamples([]); setNewsConsumed([]); setView('landing'); }} style={{ cursor: 'pointer' }} title="Back to home">
                     <span className="brand-icon">🚴</span>
-                    <span className="brand-name">STOCK RIDER</span>
+                    <span className="brand-name">RIDE</span>
                     <span className="brand-tag">BETA</span>
-                </div>
-                <div className="ticker-wrapper">
-                    <CryptoTickerBar tickers={cryptoTickers} />
                 </div>
                 <div className="top-bar-actions">
                     <button className="view-toggle-btn" onClick={() => setView('rider3d')} title="3D ride">
@@ -287,7 +280,12 @@ export const App: React.FC = () => {
                     </button>
                 </div>
             </header>
-            <MotivationalBanner rideStyle={settings.rideStyle} />
+            <MotivationalBanner
+                rideStyle={settings.rideStyle}
+                cyclingData={cyclingData}
+                aiService={aiServiceRef.current}
+            />
+            <AILoadingOverlay progress={aiProgress} />
 
             {/* Main Content */}
             <div className="main-content">
@@ -317,12 +315,6 @@ export const App: React.FC = () => {
                 <main className="right-panel">
                     <nav className="content-tabs">
                         <button
-                            className={`content-tab ${activeTab === 'charts' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('charts')}
-                        >
-                            <span className="tab-icon">📈</span> MARKETS
-                        </button>
-                        <button
                             className={`content-tab ${activeTab === 'news' ? 'active' : ''}`}
                             onClick={() => setActiveTab('news')}
                         >
@@ -340,24 +332,9 @@ export const App: React.FC = () => {
                         >
                             <span className="tab-icon">🧠</span> LEARN
                         </button>
-                        <button
-                            className={`content-tab ${activeTab === 'audio' ? 'active' : ''}`}
-                            onClick={() => setActiveTab('audio')}
-                        >
-                            <span className="tab-icon">🎧</span> AUDIO
-                        </button>
                     </nav>
 
                     <div className="content-area fade-in" key={activeTab}>
-                        {activeTab === 'charts' && (
-                            <div className="content-pane">
-                                <StockChart
-                                    stocks={stockQuotes}
-                                    selectedSymbol={selectedStock}
-                                    onSelect={setSelectedStock}
-                                />
-                            </div>
-                        )}
                         {activeTab === 'news' && (
                             <div className="content-pane">
                                 <NewsFeed items={newsItems} />
@@ -373,14 +350,20 @@ export const App: React.FC = () => {
                                 <Flashcards cadence={cyclingData.cadence} />
                             </div>
                         )}
-                        {activeTab === 'audio' && (
-                            <div className="content-pane" style={{ padding: 16 }}>
-                                <PodcastPlayer />
-                            </div>
-                        )}
                     </div>
                 </main>
             </div>
+
+            {/* Footer */}
+            <footer className="app-footer">
+                <div className="app-footer-brand">
+                    🚴 <a href="https://piwi.ai" target="_blank" rel="noopener">PIWI Ride</a>
+                </div>
+                <div className="app-footer-tagline">Train your body and your mind</div>
+                <div className="app-footer-links">
+                    <a href="https://ride.piwi.ai">ride.piwi.ai</a>
+                </div>
+            </footer>
 
             {/* Modals */}
             {showSettings && <Settings settings={settings} onUpdate={setSettings} onClose={() => setShowSettings(false)} />}

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { CryptoTicker, StockQuote, NewsItem, StartupInfo } from '../../types';
+import { NewsItem, StartupInfo } from '../../types';
 
 /**
  * DataBillboard — renders data as Canvas textures (NO DOM = fast!)
@@ -88,111 +88,6 @@ export const BillboardFrame: React.FC<BillboardFrameProps> = ({
     );
 };
 
-// ── Texture factories ──
-
-function drawMiniChart(
-    ctx: CanvasRenderingContext2D,
-    data: number[],
-    x: number, y: number, w: number, h: number,
-    color: string,
-) {
-    if (!data || data.length < 2) return;
-    const min = Math.min(...data);
-    const max = Math.max(...data);
-    const range = max - min || 1;
-
-    // Fill gradient
-    const grad = ctx.createLinearGradient(x, y, x, y + h);
-    grad.addColorStop(0, color + '40');
-    grad.addColorStop(1, color + '00');
-
-    ctx.beginPath();
-    ctx.moveTo(x, y + h);
-    data.forEach((v, i) => {
-        const px = x + (i / (data.length - 1)) * w;
-        const py = y + h - ((v - min) / range) * h;
-        ctx.lineTo(px, py);
-    });
-    ctx.lineTo(x + w, y + h);
-    ctx.closePath();
-    ctx.fillStyle = grad;
-    ctx.fill();
-
-    // Line
-    ctx.beginPath();
-    data.forEach((v, i) => {
-        const px = x + (i / (data.length - 1)) * w;
-        const py = y + h - ((v - min) / range) * h;
-        if (i === 0) ctx.moveTo(px, py);
-        else ctx.lineTo(px, py);
-    });
-    ctx.strokeStyle = color;
-    ctx.lineWidth = 2.5;
-    ctx.stroke();
-}
-
-export function createCryptoTexture(coin: CryptoTicker): THREE.CanvasTexture {
-    return createTextTexture((ctx, w, h) => {
-        const isUp = coin.change24h >= 0;
-        const changeColor = isUp ? '#00e676' : '#ff5252';
-
-        // Symbol
-        ctx.fillStyle = '#e8ecf4';
-        ctx.font = 'bold 36px monospace';
-        ctx.fillText(coin.symbol, 30, 55);
-
-        // Change badge
-        ctx.fillStyle = changeColor;
-        ctx.font = 'bold 24px monospace';
-        const changeText = `${isUp ? '▲' : '▼'} ${Math.abs(coin.change24h).toFixed(2)}%`;
-        ctx.fillText(changeText, w - 30 - ctx.measureText(changeText).width, 52);
-
-        // Price
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 48px monospace';
-        const priceStr = coin.price >= 1
-            ? '$' + coin.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-            : '$' + coin.price.toFixed(4);
-        ctx.fillText(priceStr, 30, 112);
-
-        // Name
-        ctx.fillStyle = '#505c72';
-        ctx.font = '18px monospace';
-        ctx.fillText(coin.name, 30, 142);
-
-        // Chart
-        drawMiniChart(ctx, coin.sparkline, 25, 155, w - 50, 80, changeColor);
-    });
-}
-
-export function createStockTexture(stock: StockQuote): THREE.CanvasTexture {
-    return createTextTexture((ctx, w, h) => {
-        const isUp = stock.change >= 0;
-        const changeColor = isUp ? '#00e676' : '#ff5252';
-
-        // Symbol + name
-        ctx.fillStyle = '#e8ecf4';
-        ctx.font = 'bold 36px monospace';
-        ctx.fillText(stock.symbol, 30, 55);
-        ctx.fillStyle = '#505c72';
-        ctx.font = '16px monospace';
-        ctx.fillText(stock.name, 30 + ctx.measureText(stock.symbol).width + 15, 52);
-
-        // Price
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 44px monospace';
-        ctx.fillText('$' + stock.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }), 30, 108);
-
-        // Change
-        ctx.fillStyle = changeColor;
-        ctx.font = 'bold 22px monospace';
-        const sign = isUp ? '+' : '';
-        ctx.fillText(`${sign}${stock.change.toFixed(2)} (${Math.abs(stock.changePercent).toFixed(2)}%)`, 30, 140);
-
-        // Chart
-        drawMiniChart(ctx, stock.data.map(d => d.value), 25, 155, w - 50, 80, changeColor);
-    });
-}
 
 export function createNewsTexture(item: NewsItem): THREE.CanvasTexture {
     return createTextTexture((ctx, w, h) => {
@@ -288,12 +183,35 @@ export function createStartupTexture(startup: StartupInfo): THREE.CanvasTexture 
 }
 
 export function createSummaryTexture(lines: string[], color: string = '#00e5ff'): THREE.CanvasTexture {
+    const CANVAS_W = 800;
+    const PADDING = 40;
+    const MAX_FONT = 28;
+    const MIN_FONT = 14;
+    const LINE_H = 38;
+
     return createTextTexture((ctx, w, h) => {
         ctx.fillStyle = color;
-        ctx.font = 'bold 28px monospace';
         ctx.textAlign = 'center';
+
         lines.forEach((line, i) => {
-            ctx.fillText(line, w / 2, 40 + i * 38);
+            // Auto-scale: find largest font that fits
+            let fontSize = MAX_FONT;
+            ctx.font = `bold ${fontSize}px monospace`;
+            while (ctx.measureText(line).width > w - PADDING * 2 && fontSize > MIN_FONT) {
+                fontSize -= 2;
+                ctx.font = `bold ${fontSize}px monospace`;
+            }
+
+            // If still too long, truncate with ellipsis
+            let text = line;
+            if (ctx.measureText(text).width > w - PADDING * 2) {
+                while (ctx.measureText(text + '…').width > w - PADDING * 2 && text.length > 10) {
+                    text = text.slice(0, -1);
+                }
+                text += '…';
+            }
+
+            ctx.fillText(text, w / 2, 40 + i * LINE_H);
         });
-    }, 600, 40 + lines.length * 38 + 20);
+    }, CANVAS_W, 40 + lines.length * LINE_H + 20);
 }
