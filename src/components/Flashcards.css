@@ -1,0 +1,127 @@
+/* ═══════════════════════════════════════
+   Flashcards — Learn while pedaling
+   ═══════════════════════════════════════ */
+
+.flashcards {
+    padding: 16px;
+}
+
+.flashcards-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    margin-bottom: 12px;
+}
+
+.flashcards-count {
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+/* Card */
+.flashcard {
+    perspective: 600px;
+    cursor: pointer;
+    height: 200px;
+    margin-bottom: 12px;
+}
+
+.flashcard-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    transform-style: preserve-3d;
+}
+
+.flashcard.flipped .flashcard-inner {
+    transform: rotateY(180deg);
+}
+
+.flashcard-front,
+.flashcard-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border: 1px solid var(--border);
+}
+
+.flashcard-front {
+    background: linear-gradient(135deg, var(--surface-1), var(--surface-2));
+}
+
+.flashcard-back {
+    background: linear-gradient(135deg, #0a1628, #0f1f3a);
+    border-color: var(--accent);
+    transform: rotateY(180deg);
+}
+
+.flashcard-category {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 3px 8px;
+    border-radius: 4px;
+    align-self: flex-start;
+    margin-bottom: 12px;
+}
+
+.flashcard-question {
+    font-family: var(--font-sans);
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: var(--text-primary);
+}
+
+.flashcard-answer {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.flashcard-hint {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: auto;
+    text-align: center;
+}
+
+/* Actions */
+.flashcard-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.flashcard-btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 10px 24px;
+    border-radius: 8px;
+    border: 1px solid var(--accent);
+    background: var(--accent-dim);
+    color: var(--accent);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.flashcard-btn:hover {
+    background: var(--accent);
+    color: var(--bg-primary);
+}

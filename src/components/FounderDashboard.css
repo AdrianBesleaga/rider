@@ -1,0 +1,79 @@
+/* ═══════════════════════════════════════
+   Founder Dashboard
+   ═══════════════════════════════════════ */
+
+.founder-dashboard {
+    padding: 16px;
+    border-top: 1px solid var(--border);
+}
+
+.founder-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.founder-icon {
+    font-size: 16px;
+}
+
+.founder-company {
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.founder-badge {
+    font-family: var(--font-mono);
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    background: linear-gradient(135deg, #ff6b35, #ff9f1c);
+    color: #000;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: auto;
+}
+
+.founder-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.founder-metric-card {
+    background: var(--surface-2);
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.founder-metric-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+}
+
+.founder-metric-value {
+    font-family: var(--font-mono);
+    font-size: 18px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ff6b35, #ff9f1c);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.founder-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    padding: 16px;
+}

@@ -170,3 +170,28 @@
     letter-spacing: 1px;
     color: var(--text-muted);
 }
+
+/* ─── End Ride button ─── */
+
+.hud-end-btn {
+    border-color: var(--color-loss) !important;
+    color: var(--color-loss) !important;
+}
+
+.hud-end-btn:hover {
+    background: rgba(255, 82, 82, 0.2) !important;
+}
+
+/* ─── Animations ─── */
+
+@keyframes pulse-dot {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.4;
+    }
+}

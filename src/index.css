@@ -328,3 +328,49 @@ body {
         flex: 1;
     }
 }
+
+/* ═══════════════════════════════════════
+   OBS Overlay Mode
+   ═══════════════════════════════════════ */
+
+.obs-overlay {
+    background: transparent !important;
+}
+
+.obs-overlay .top-bar,
+.obs-overlay .left-panel {
+    background: transparent !important;
+    border-color: transparent !important;
+}
+
+.obs-overlay .hud-overlay {
+    pointer-events: none;
+}
+
+/* ─── Top Bar Actions ─── */
+
+.top-bar-actions {
+    display: flex;
+    gap: 6px;
+    padding-right: 12px;
+    align-items: center;
+}
+
+.end-ride-btn {
+    border-color: var(--color-loss) !important;
+    color: var(--color-loss) !important;
+}
+
+.end-ride-btn:hover {
+    background: rgba(255, 82, 82, 0.15) !important;
+}
+
+/* ─── HUD Podcast Slot ─── */
+
+.hud-podcast-slot {
+    position: absolute;
+    top: 12px;
+    right: 220px;
+    z-index: 20;
+    pointer-events: auto;
+}

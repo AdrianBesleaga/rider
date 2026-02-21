@@ -1,0 +1,111 @@
+/**
+ * Ride Facts & Motivational Messages
+ *
+ * Static data pools for motivational banners during rides.
+ * Categorized by ride style (road / mtb) and motivation.
+ */
+
+import type { FactCategory } from '../types';
+
+export interface RideFact {
+    text: string;
+    category: FactCategory;
+}
+
+export const RIDE_FACTS: RideFact[] = [
+    // ── Road Cycling Facts ──
+    { text: "The Tour de France covers ~3,500 km over 21 stages.", category: 'road' },
+    { text: "Eddy Merckx won the Tour de France 5 times — still the joint record.", category: 'road' },
+    { text: "The hour record: 56.79 km set by Filippo Ganna in 2022.", category: 'road' },
+    { text: "Alpe d'Huez has 21 hairpin bends over 13.8 km.", category: 'road' },
+    { text: "Pro cyclists average 40-45 km/h in flat stages.", category: 'road' },
+    { text: "A pro peloton can save up to 40% energy by drafting.", category: 'road' },
+    { text: "The first Tour de France was held in 1903 with just 60 riders.", category: 'road' },
+    { text: "Mont Ventoux is called 'The Beast of Provence' — 1,912m altitude.", category: 'road' },
+    { text: "Carbon fiber frames weigh as little as 700g.", category: 'road' },
+    { text: "Pro cyclists burn 5,000–8,000 calories during a mountain stage.", category: 'road' },
+    { text: "The fastest Tour de France speed was 41.16 km/h by Lance Armstrong (later voided).", category: 'road' },
+    { text: "Cycling is the 3rd most popular sport in the world.", category: 'road' },
+    { text: "The UCI minimum bike weight is 6.8 kg for racing.", category: 'road' },
+    { text: "Paris-Roubaix is called 'The Hell of the North' due to cobblestones.", category: 'road' },
+    { text: "Tadej Pogačar won his first Tour de France at age 21.", category: 'road' },
+    { text: "A typical road bike tire is inflated to 80-130 PSI.", category: 'road' },
+    { text: "The Milan-San Remo is the longest one-day race at ~300 km.", category: 'road' },
+    { text: "Cadence of 80-100 RPM is considered optimal for most riders.", category: 'road' },
+    { text: "FTP (Functional Threshold Power) is your best 1-hour power output.", category: 'road' },
+    { text: "The Giro d'Italia's pink jersey is called the 'Maglia Rosa'.", category: 'road' },
+    { text: "Aerodynamics account for 80% of resistance at speeds above 30 km/h.", category: 'road' },
+    { text: "The world's longest bike is 47.5 meters — set in the Netherlands.", category: 'road' },
+    { text: "Heart rate zone 2 training builds your aerobic base most efficiently.", category: 'road' },
+    { text: "The Stelvio Pass has 48 hairpins and climbs to 2,758m.", category: 'road' },
+    { text: "Pro sprinters can produce over 1,800W in a final sprint.", category: 'road' },
+    { text: "Disc brakes are now standard on pro road bikes since 2018.", category: 'road' },
+    { text: "Cycling 30 min/day reduces heart disease risk by 50%.", category: 'road' },
+    { text: "The 'bonk' happens when glycogen stores are fully depleted.", category: 'road' },
+    { text: "Electronic shifting (Di2/AXS) shifts in under 100 milliseconds.", category: 'road' },
+    { text: "The peloton effect: riding in a group is 30-40% more efficient.", category: 'road' },
+
+    // ── MTB Facts ──
+    { text: "Red Bull Rampage features drops over 20 meters high.", category: 'mtb' },
+    { text: "The first mountain bike race was the Repack Downhill in 1976.", category: 'mtb' },
+    { text: "Modern MTB suspension travel ranges from 100mm (XC) to 200mm (DH).", category: 'mtb' },
+    { text: "Whistler Bike Park has over 80 trails across 4,900+ vertical feet.", category: 'mtb' },
+    { text: "29er wheels roll over obstacles more easily than 27.5\" wheels.", category: 'mtb' },
+    { text: "Dropper seatposts revolutionized MTB riding in the 2010s.", category: 'mtb' },
+    { text: "The Enduro World Series started in 2013.", category: 'mtb' },
+    { text: "MTB tires run at 20-30 PSI — much lower than road bikes.", category: 'mtb' },
+    { text: "Danny MacAskill's 'The Ridge' video has over 100M views.", category: 'mtb' },
+    { text: "Downhill MTB racers can reach speeds over 80 km/h.", category: 'mtb' },
+    { text: "Cross-country (XC) MTB has been an Olympic sport since 1996.", category: 'mtb' },
+    { text: "The longest MTB trail in the world is the Great Divide route: 4,418 km.", category: 'mtb' },
+    { text: "Tubeless tires reduce puncture risk and rolling resistance.", category: 'mtb' },
+    { text: "Mullet bikes use a 29\" front wheel and 27.5\" rear wheel.", category: 'mtb' },
+    { text: "Brandon Semenuk has won Rampage 4 times.", category: 'mtb' },
+    { text: "Trail difficulty ratings: green (easy) → blue → black → double black.", category: 'mtb' },
+    { text: "Modern DH bikes weigh around 14-16 kg with full suspension.", category: 'mtb' },
+    { text: "The first full-suspension MTB was the Specialized Stumpjumper in 1981.", category: 'mtb' },
+    { text: "Cornering technique: look where you want to go, not at obstacles.", category: 'mtb' },
+    { text: "Nino Schurter is the most decorated XC MTB racer in history.", category: 'mtb' },
+    { text: "MTB chain guides prevent chain drops on rough terrain.", category: 'mtb' },
+    { text: "Pump tracks improve your bike handling without pedaling.", category: 'mtb' },
+    { text: "The 'manual' (rear wheelie without pedaling) is a core MTB skill.", category: 'mtb' },
+    { text: "E-MTBs have motors capped at 250W and 25 km/h in the EU.", category: 'mtb' },
+    { text: "Bike parks like Finale Ligure attract 100K+ riders per year.", category: 'mtb' },
+    { text: "MTB body armor covers knees, elbows, chest, and back.", category: 'mtb' },
+    { text: "Flat pedals give beginners more confidence than clipless on trails.", category: 'mtb' },
+    { text: "The bunny hop is the most useful MTB technique after braking.", category: 'mtb' },
+    { text: "Greg Minnaar has won 24 DH World Cup races — the all-time record.", category: 'mtb' },
+    { text: "Moab, Utah is considered the MTB mecca of the world.", category: 'mtb' },
+
+    // ── Motivational ──
+    { text: "Pain is temporary. Fitness is forever. Keep pushing! 💪", category: 'motivation' },
+    { text: "You're already lapping everyone on the couch.", category: 'motivation' },
+    { text: "The legs feed the wolf. Keep turning those pedals.", category: 'motivation' },
+    { text: "Every ride makes you stronger than yesterday.", category: 'motivation' },
+    { text: "Shut up, legs! — Jens Voigt", category: 'motivation' },
+    { text: "It never gets easier. You just get faster.", category: 'motivation' },
+    { text: "Suffering is optional. Quitting is not an option.", category: 'motivation' },
+    { text: "Your body can stand almost anything. It's your mind you have to convince.", category: 'motivation' },
+    { text: "One more pedal stroke. Then one more. That's all it takes.", category: 'motivation' },
+    { text: "Champions are made when no one is watching.", category: 'motivation' },
+    { text: "The best ride is the one you almost didn't do.", category: 'motivation' },
+    { text: "You don't stop riding because you get old. You get old because you stop riding.", category: 'motivation' },
+    { text: "Life is like riding a bicycle — to keep your balance, you must keep moving. — Einstein", category: 'motivation' },
+    { text: "Sweat today. Shine tomorrow. 🔥", category: 'motivation' },
+    { text: "Ride hard. Recover harder. Repeat.", category: 'motivation' },
+    { text: "The mountain doesn't care how tired you are. Keep climbing.", category: 'motivation' },
+    { text: "Every watt counts. Every second matters.", category: 'motivation' },
+    { text: "You're building something nobody can take away: your fitness.", category: 'motivation' },
+    { text: "Don't count the minutes. Make the minutes count.", category: 'motivation' },
+    { text: "The pain you feel today will be the strength you feel tomorrow.", category: 'motivation' },
+    { text: "Ride like you stole it. 🚴‍♂️💨", category: 'motivation' },
+    { text: "Strong legs. Strong mind. Stronger you.", category: 'motivation' },
+    { text: "No shortcuts. Just pedal strokes.", category: 'motivation' },
+    { text: "Be the rider you needed when you started.", category: 'motivation' },
+    { text: "This is your hour. Own every second.", category: 'motivation' },
+    { text: "Excuses don't burn calories. Pedaling does.", category: 'motivation' },
+    { text: "Today's effort is tomorrow's easy ride.", category: 'motivation' },
+    { text: "Cadence up. Head down. Power on.", category: 'motivation' },
+    { text: "You're not training. You're transforming.", category: 'motivation' },
+    { text: "Breathe. Push. Repeat. You've got this.", category: 'motivation' },
+];

@@ -2,7 +2,7 @@ import React, { useRef, useMemo } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { OrbitControls } from '@react-three/drei';
 import * as THREE from 'three';
-import { CyclingData, CryptoTicker as CryptoTickerType, StockQuote, NewsItem } from '../types';
+import { CyclingData, CryptoTicker as CryptoTickerType, StockQuote, NewsItem, RideStyle } from '../types';
 import { CyberEnvironment } from './3d/Environment';
 import { Road } from './3d/Road';
 import { Cyclist } from './3d/Cyclist';
@@ -299,16 +299,17 @@ interface SceneContentProps {
     cryptoTickers: CryptoTickerType[];
     stockQuotes: StockQuote[];
     newsItems: NewsItem[];
+    rideStyle: RideStyle;
 }
 
-function SceneContent({ cyclingData, cryptoTickers, stockQuotes, newsItems }: SceneContentProps) {
+function SceneContent({ cyclingData, cryptoTickers, stockQuotes, newsItems, rideStyle }: SceneContentProps) {
     const effectiveSpeed = Math.max(cyclingData.speed, 12);
 
     return (
         <>
             <CameraControls />
             <CyberEnvironment speed={effectiveSpeed} />
-            <Road speed={effectiveSpeed} />
+            <Road speed={effectiveSpeed} rideStyle={rideStyle} />
 
             {/* Bike centered on road */}
             <Cyclist cadence={Math.max(cyclingData.cadence, 0)} />
@@ -331,6 +332,7 @@ interface RiderSceneProps {
     cryptoTickers: CryptoTickerType[];
     stockQuotes: StockQuote[];
     newsItems: NewsItem[];
+    rideStyle: RideStyle;
 }
 
 export const RiderScene: React.FC<RiderSceneProps> = ({
@@ -338,6 +340,7 @@ export const RiderScene: React.FC<RiderSceneProps> = ({
     cryptoTickers,
     stockQuotes,
     newsItems,
+    rideStyle,
 }) => {
     return (
         <div style={{ width: '100%', height: '100%', position: 'relative' }}>
@@ -352,6 +355,7 @@ export const RiderScene: React.FC<RiderSceneProps> = ({
                     cryptoTickers={cryptoTickers}
                     stockQuotes={stockQuotes}
                     newsItems={newsItems}
+                    rideStyle={rideStyle}
                 />
             </Canvas>
         </div>

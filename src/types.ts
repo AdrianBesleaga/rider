@@ -66,4 +66,8 @@ export interface StartupInfo {
 
 // ─── App state ───
 
-export type ContentTab = 'charts' | 'news' | 'spotlight';
+export type ContentTab = 'charts' | 'news' | 'spotlight' | 'learn' | 'audio';
+
+export type RideStyle = 'road' | 'mtb';
+
+export type FactCategory = RideStyle | 'motivation';
